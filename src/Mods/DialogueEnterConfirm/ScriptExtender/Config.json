@@ -1,0 +1,7 @@
+{
+    "RequiredVersion": 18,
+    "ModTable": "DialogueEnterConfirm",
+    "FeatureFlags": [
+        "Lua"
+    ]
+}
