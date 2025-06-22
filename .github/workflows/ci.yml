@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate mod structure
+      run: |
+        echo "🔍 Проверка структуры мода..."
+        
+        # Проверка обязательных файлов
+        required_files=(
+          "src/Mods/DialogueEnterConfirm/meta.lsx"
+          "src/Mods/DialogueEnterConfirm/ScriptExtender/Config.json"
+          "src/Mods/DialogueEnterConfirm/ScriptExtender/Lua/BootstrapClient.lua"
+          "src/Mods/DialogueEnterConfirm/ScriptExtender/Lua/Client/DialogueEnterHandler.lua"
+        )
+        
+        for file in "${required_files[@]}"; do
+          if [[ ! -f "$file" ]]; then
+            echo "❌ Отсутствует обязательный файл: $file"
+            exit 1
+          else
+            echo "✅ Найден: $file"
+          fi
+        done
+        
+    - name: Validate Lua syntax
+      run: |
+        echo "🔍 Проверка синтаксиса Lua файлов..."
+        
+        # Установка Lua для проверки синтаксиса
+        sudo apt-get update
+        sudo apt-get install -y lua5.3
+        
+        # Проверка всех .lua файлов
+        find src/ -name "*.lua" | while read -r file; do
+          echo "Проверка: $file"
+          if ! lua5.3 -p "$file" > /dev/null 2>&1; then
+            echo "❌ Синтаксическая ошибка в: $file"
+            lua5.3 -p "$file"
+            exit 1
+          else
+            echo "✅ Синтаксис корректен: $file"
+          fi
+        done
+        
+    - name: Validate XML files
+      run: |
+        echo "🔍 Проверка XML файлов..."
+        
+        # Установка xmllint
+        sudo apt-get install -y libxml2-utils
+        
+        # Проверка всех .lsx файлов
+        find src/ -name "*.lsx" | while read -r file; do
+          echo "Проверка: $file"
+          if ! xmllint --noout "$file" 2>/dev/null; then
+            echo "❌ Ошибка XML в: $file"
+            xmllint "$file"
+            exit 1
+          else
+            echo "✅ XML корректен: $file"
+          fi
+        done
+        
+    - name: Validate JSON files
+      run: |
+        echo "🔍 Проверка JSON файлов..."
+        
+        # Установка jq для проверки JSON
+        sudo apt-get install -y jq
+        
+        # Проверка всех .json файлов
+        find src/ -name "*.json" | while read -r file; do
+          echo "Проверка: $file"
+          if ! jq empty "$file" 2>/dev/null; then
+            echo "❌ Ошибка JSON в: $file"
+            jq empty "$file"
+            exit 1
+          else
+            echo "✅ JSON корректен: $file"
+          fi
+        done
+        
+    - name: Test build process
+      run: |
+        echo "🔨 Тестирование процесса сборки..."
+        chmod +x build.sh
+        ./build.sh "test-build"
+        
+        # Проверка создания файлов сборки
+        if [[ ! -d "releases" ]]; then
+          echo "❌ Папка releases не создана"
+          exit 1
+        fi
+        
+        if [[ ! -f "releases/DialogueEnterConfirm_vtest-build_Source.zip" ]]; then
+          echo "❌ Архив исходников не создан"
+          exit 1
+        fi
+        
+        echo "✅ Процесс сборки работает корректно"
