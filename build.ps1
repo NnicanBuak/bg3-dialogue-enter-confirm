@@ -12,7 +12,7 @@ if (Get-Variable -Name IsWindows -ErrorAction SilentlyContinue) {
     $isWindowsHost = [bool](Get-Variable -Name IsWindows).Value
 }
 
-$repoRoot = $PSScriptRoot
+$repoRoot = (Resolve-Path -LiteralPath $PSScriptRoot).Path
 $packagePath = Join-Path $repoRoot "package.json"
 $package = Get-Content -LiteralPath $packagePath -Raw | ConvertFrom-Json
 
