@@ -94,8 +94,8 @@ if (-not $divine) {
     throw "Divine.exe was not found in the LSLib archive."
 }
 
-$buildRoot = Join-Path $repoRoot "build"
-$releasesRoot = Join-Path $repoRoot "releases"
+$buildRoot = [System.IO.Path]::GetFullPath((Join-Path $repoRoot "build"))
+$releasesRoot = [System.IO.Path]::GetFullPath((Join-Path $repoRoot "releases"))
 if (Test-Path -LiteralPath $buildRoot) { Remove-Item -LiteralPath $buildRoot -Recurse -Force }
 if (Test-Path -LiteralPath $releasesRoot) { Remove-Item -LiteralPath $releasesRoot -Recurse -Force }
 New-Item -ItemType Directory -Path $buildRoot, $releasesRoot | Out-Null
@@ -118,8 +118,10 @@ function Invoke-Divine {
 }
 
 $pakName = "DialogueEnterConfirm_v$Version.pak"
-$pakPath = Join-Path $releasesRoot $pakName
+$pakPath = [System.IO.Path]::GetFullPath((Join-Path $releasesRoot $pakName))
 Write-Host "Packing $pakName with LSLib $lslibVersion..."
+Write-Host "Divine source: $buildRoot"
+Write-Host "Divine destination: $pakPath"
 Invoke-Divine @("-g", "bg3", "-a", "create-package", "-s", $buildRoot, "-d", $pakPath)
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $pakPath -PathType Leaf)) {
     throw "Divine failed to create $pakName."
