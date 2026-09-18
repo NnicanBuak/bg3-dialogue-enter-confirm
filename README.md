@@ -23,9 +23,9 @@ Script Extender устанавливается отдельно. Мод не с�
 
 ## Установка
 
-Скачайте `DialogueEnterConfirm_v1.0.0_Install.zip` со страницы [GitHub Releases](https://github.com/NnicanBuak/bg3-dialogue-enter-confirm/releases), распакуйте `.pak` в папку модов BG3 и активируйте мод в BG3 Mod Manager или Vortex. Подробные пути, обновление и удаление описаны в [docs/INSTALL.md](docs/INSTALL.md).
+После публикации релиза скачайте `DialogueEnterConfirm_v1.0.0_Install.zip` со страницы [GitHub Releases](https://github.com/NnicanBuak/bg3-dialogue-enter-confirm/releases), распакуйте `.pak` в папку модов BG3 и активируйте мод в BG3 Mod Manager или Vortex. Подробные пути, обновление и удаление описаны в [docs/INSTALL.md](docs/INSTALL.md).
 
-На Nexus Mods будет размещён тот же установочный архив. Встроенный каталог BG3 не поддерживается.
+Для Nexus Mods подготовлен тот же установочный архив; страницу можно создать после авторизации автора. Встроенный каталог BG3 не поддерживается.
 
 ## Использование
 
