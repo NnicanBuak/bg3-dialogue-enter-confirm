@@ -66,6 +66,10 @@ if ($ValidateOnly) {
     exit 0
 }
 
+if (-not $isWindowsHost) {
+    throw "LSLib 1.20.4 package creation is supported by this build script on Windows only. Use -ValidateOnly on Linux."
+}
+
 $lslibVersion = "1.20.4"
 $lslibUrl = "https://github.com/Norbyte/lslib/releases/download/v$lslibVersion/ExportTool-v$lslibVersion.zip"
 $lslibSha256 = "5E02368FB8ACAFDA9B45ACBA37A3F3BF507FC3D65A083A159ABBEAB06337190E"
