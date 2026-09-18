@@ -4,11 +4,11 @@
 *.lsb
 build/
 temp/
+.tools/
 *.tmp
 
 # Releases
-releases/*.pak
-releases/*.zip
+releases/
 
 # Backup files
 *.bak

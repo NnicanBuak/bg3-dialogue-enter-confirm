@@ -1,4 +1,4 @@
-name: Build and Release
+name: Build release
 
 on:
   push:
@@ -7,71 +7,73 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (e.g., 1.0.0)'
+        description: Release version (for example 1.0.0-rc.1)
         required: true
-        default: '1.0.0'
+        default: 1.0.0-rc.1
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set version
-      id: version
-      run: |
-        if [[ "${{ github.event_name }}" == "push" ]]; then
-          VERSION=${GITHUB_REF#refs/tags/v}
-        else
-          VERSION=${{ github.event.inputs.version }}
-        fi
-        echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
-        echo "Building version: ${VERSION}"
-        
-    - name: Build source archive
-      run: |
-        ./build.sh ${{ steps.version.outputs.VERSION }}
-        
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-artifacts
-        path: |
-          releases/
-          build/
-          
-  release:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select version
+        id: version
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            version="${GITHUB_REF#refs/tags/v}"
+          else
+            version="${{ inputs.version }}"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build package, archives, and checksums
+        shell: pwsh
+        run: ./build.ps1 -Version "${{ steps.version.outputs.version }}"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dialogue-enter-confirm-release
+          path: releases/
+
+  draft-release:
     needs: build
-    runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-    
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-artifacts
-        
-    - name: Set version
-      id: version
-      run: |
-        VERSION=${GITHUB_REF#refs/tags/v}
-        echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
-        
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: v${{ steps.version.outputs.VERSION }}
-        name: Dialogue Enter Confirm v${{ steps.version.outputs.VERSION }}
-        body_path: releases/RELEASE_NOTES_v${{ steps.version.outputs.VERSION }}.md
-        draft: false
-        prerelease: false
-        files: |
-          releases/*.zip
-          releases/BUILD_INSTRUCTIONS.txt
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dialogue-enter-confirm-release
+          path: releases
+
+      - name: Select version
+        id: version
+        shell: bash
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Create draft GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Dialogue Enter Confirm v${{ steps.version.outputs.version }}
+          body_path: releases/RELEASE_NOTES_v${{ steps.version.outputs.version }}.md
+          draft: true
+          prerelease: true
+          files: |
+            releases/*.pak
+            releases/*_Install.zip
+            releases/*_Source.zip
+            releases/SHA256SUMS.txt
+            releases/BUILD_INFO.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

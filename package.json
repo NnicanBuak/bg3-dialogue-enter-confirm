@@ -4,13 +4,13 @@
   "description": "BG3 mod that allows confirming dialogue choices with Enter key",
   "main": "src/Mods/DialogueEnterConfirm/ScriptExtender/Lua/Client/DialogueEnterHandler.lua",
   "scripts": {
-    "build": "./build.sh",
-    "release": "./build.sh $npm_package_version",
-    "validate": "echo 'Validation would run here'"
+    "build": "pwsh -NoProfile -File ./build.ps1",
+    "release": "pwsh -NoProfile -File ./build.ps1 -Version 1.0.0",
+    "validate": "pwsh -NoProfile -File ./build.ps1 -ValidateOnly"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/username/bg3-dialogue-enter-confirm.git"
+    "url": "git+https://github.com/NnicanBuak/bg3-dialogue-enter-confirm.git"
   },
   "keywords": [
     "baldurs-gate-3",
@@ -23,22 +23,21 @@
     "ui",
     "quality-of-life"
   ],
-  "author": "DialogueEnterConfirm Contributors",
+  "author": "NnicanBuak",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/username/bg3-dialogue-enter-confirm/issues"
+    "url": "https://github.com/NnicanBuak/bg3-dialogue-enter-confirm/issues"
   },
-  "homepage": "https://github.com/username/bg3-dialogue-enter-confirm#readme",
+  "homepage": "https://github.com/NnicanBuak/bg3-dialogue-enter-confirm#readme",
   "engines": {
-    "bg3se": ">=18"
+    "bg3se": ">=32"
   },
   "bg3": {
     "minGameVersion": "4.1.1.3905361",
     "compatibleWith": [
-      "patch8",
-      "patch9"
+      "patch8"
     ],
     "modType": "script-extender",
-    "uuid": "550e8400-e29b-41d4-a716-446655440000"
+    "uuid": "4a2a7773-413e-4e6a-945f-8bf74f563c6a"
   }
 }
